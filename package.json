@@ -1,0 +1,31 @@
+{
+  "name": "pico-redis",
+  "version": "1.0.0",
+  "description": "An incredibly tiny redis wrapper",
+  "main": "pico-redis.js",
+  "dependencies": {
+    "redis": "^2.7.1"
+  },
+  "devDependencies": {
+    "ava": "^0.18.2"
+  },
+  "scripts": {
+    "test": "ava --verbose || exit 0",
+    "test:dev": "ava --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stolksdorf/pico-redis.git"
+  },
+  "keywords": [
+    "redis",
+    "promise",
+    "wrapper"
+  ],
+  "author": "stolksdorf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stolksdorf/pico-redis/issues"
+  },
+  "homepage": "https://github.com/stolksdorf/pico-redis#readme"
+}
