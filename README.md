@@ -46,7 +46,7 @@ Removes the `val` stored at `key`. Returns a promise.
 
 
 ### `redis.connect([redis_url])`
-Creates and connects to the redis instance
+Creates and connects to the redis instance. By default, uses the `process.env.REDIS_URL` if `redis_url` is not specified.
 
 ### `redis.close()`
 Closes the connection
