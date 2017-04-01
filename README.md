@@ -3,7 +3,7 @@ An incredibly tiny redis wrapper
 
 [![NPM](https://nodei.co/npm/pico-redis.png)](https://nodei.co/npm/pico-redis/)
 
-Promise and scoped based wrapper for [node](https://www.npmjs.com/package/redis)
+A simple promise and scoped based wrapper for [node-redis](https://www.npmjs.com/package/redis)
 
 
 ## install
