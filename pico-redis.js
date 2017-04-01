@@ -1,3 +1,4 @@
+const Redis = require('redis');
 let redis;
 
 const Picoredis = (scope)=>{
@@ -6,7 +7,7 @@ const Picoredis = (scope)=>{
 	return {
 		raw : redis,
 		connect : (redisUrl = process.env.REDIS_URL, opts)=>{
-			redis = require('redis').createClient(redisUrl, opts);
+			redis = Redis.createClient(redisUrl, opts);
 			Picoredis.raw = redis;
 			return Promise.resolve();
 		},
@@ -22,7 +23,6 @@ const Picoredis = (scope)=>{
 			})
 		},
 
-
 		get : (key)=>{
 			return new Promise((resolve, reject)=>{
 				redis.get(`${scope}${key}`, (err, res)=>{
@@ -35,7 +35,7 @@ const Picoredis = (scope)=>{
 		set : (key, val, expiry)=>{
 			return new Promise((resolve, reject)=>{
 				if(expiry){
-					redis.set(`${scope}${key}`, JSON.stringify(val), 'EX', expiry, (err)=>{
+					redis.setex(`${scope}${key}`, expiry, JSON.stringify(val), (err)=>{
 						if(err) return reject(err);
 						return resolve();
 					});
