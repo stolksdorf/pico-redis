@@ -1,15 +1,21 @@
 const Redis = require('redis');
 let redis;
 
-const Picoredis = (scope)=>{
+const PicoRedis = (scope)=>{
 	scope = (scope ? scope + '|' : '');
 
 	return {
 		raw : redis,
 		connect : (redisUrl = process.env.REDIS_URL, opts)=>{
 			redis = Redis.createClient(redisUrl, opts);
-			Picoredis.raw = redis;
-			return Promise.resolve();
+			PicoRedis.raw = redis;
+			return new Promise((resolve, reject)=>{
+				redis.on('ready', ()=>resolve());
+				redis.on('error', (err)=>{
+					redis.quit();
+					return reject(err)
+				});
+			})
 		},
 		close : ()=>{
 			return redis.quit();
@@ -66,4 +72,4 @@ const Picoredis = (scope)=>{
 	}
 }
 
-module.exports = Object.assign(Picoredis, Picoredis());
+module.exports = Object.assign(PicoRedis, PicoRedis());
