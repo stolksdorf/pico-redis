@@ -1,75 +1,67 @@
 const Redis = require('redis');
-let redis;
+let baseClient;
 
-const PicoRedis = (scope)=>{
-	scope = (scope ? scope + '|' : '');
-
-	return {
-		raw : redis,
+const buildScope = (scope='')=>{
+	scope = (scope ? `${scope}|` : '');
+	let client;
+	const redis = {
+		client : ()=>client || baseClient,
 		connect : (redisUrl = process.env.REDIS_URL, opts)=>{
-			redis = Redis.createClient(redisUrl, opts);
-			PicoRedis.raw = redis;
+			client = Redis.createClient(redisUrl, opts);
+			if(!baseClient) baseClient = client;
+
 			return new Promise((resolve, reject)=>{
-				redis.on('ready', ()=>resolve());
-				redis.on('error', (err)=>{
-					redis.quit();
-					return reject(err)
+				redis.client().on('ready', ()=>resolve(redis));
+				redis.client().on('error', (err)=>{
+					redis.client().quit();
+					return reject(err);
 				});
 			})
 		},
+		scope : (newScope)=>buildScope(newScope),
 		close : ()=>{
-			return redis.quit();
+			return new Promise((resolve, reject)=>{
+				redis.client().quit((err)=>err ? reject(err) : resolve());
+			})
 		},
 		clear : ()=>{
 			return new Promise((resolve, reject)=>{
-				redis.flushdb((err, success)=>{
+				redis.client().flushdb((err, success)=>{
 					if(err || !success) return reject(err);
-					return resolve();
+					return resolve(redis);
 				});
 			})
 		},
-
 		get : (key)=>{
 			return new Promise((resolve, reject)=>{
-				redis.get(`${scope}${key}`, (err, res)=>{
+				redis.client().get(`${scope}${key}`, (err, res)=>{
 					if(err) return reject(err);
 					try{ return resolve(JSON.parse(res)); }
 					catch(e){ return resolve(res) };
 				});
 			});
 		},
-		set : (key, val, expiry)=>{
+		set : (key, val, expiryInMS)=>{
 			return new Promise((resolve, reject)=>{
-				if(expiry){
-					redis.setex(`${scope}${key}`, expiry, JSON.stringify(val), (err)=>{
-						if(err) return reject(err);
-						return resolve();
-					});
+				if(expiryInMS){
+					redis.client().psetex(`${scope}${key}`, expiryInMS, JSON.stringify(val), (err)=>err?reject(err):resolve());
 				}else{
-					redis.set(`${scope}${key}`, JSON.stringify(val), (err)=>{
-						if(err) return reject(err);
-						return resolve();
-					});
+					redis.client().set(`${scope}${key}`, JSON.stringify(val), (err)=>err?reject(err):resolve());
 				}
 			});
 		},
 		del : (key)=>{
 			return new Promise((resolve, reject)=>{
-				redis.del(`${scope}${key}`, (err)=>{
-					if(err) return reject(err);
-					return resolve();
-				});
+				redis.client().del(`${scope}${key}`, (err)=>err?reject(err):resolve());
 			});
 		},
 		keys : (param='*')=>{
 			return new Promise((resolve, reject)=>{
-				redis.keys(`${scope}${param}`, (err, keys)=>{
-					if(err) return reject(err);
-					return resolve(keys);
-				});
+				redis.client().keys(`${scope}${param}`, (err, keys)=>err?reject(err):resolve(keys));
 			});
-		}
-	}
-}
+		},
+	};
+	return redis;
+};
 
-module.exports = Object.assign(PicoRedis, PicoRedis());
+module.exports = buildScope();
