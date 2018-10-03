@@ -49,7 +49,7 @@ Removes the `val` stored at `key`. Returns a promise.
 
 
 ### `redis.connect([redis_url], [redis_opts])`
-Creates and connects to the redis instance. By default, uses the `process.env.REDIS_URL` if `redis_url` is not specified. This will also create a new redis client isolated to this scope, see `redis.scope`
+Creates and connects to the redis instance. By default, uses the `process.env.REDIS_URL` if `redis_url` is not specified. This will also create a new redis client isolated to this scope, see `redis.scope`. You can review the `redis_opts` [here](https://github.com/NodeRedis/node_redis#options-object-properties).
 
 ### `redis.close()`
 Closes the connection. Returns a promise.

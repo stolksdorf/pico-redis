@@ -1,6 +1,6 @@
 {
   "name": "pico-redis",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "An incredibly tiny redis wrapper",
   "main": "pico-redis.js",
   "dependencies": {
