@@ -11,7 +11,7 @@ const buildScope = (scope='')=>{
 			if(!baseClient) baseClient = client;
 
 			return new Promise((resolve, reject)=>{
-				redis.client().on('ready', ()=>resolve());
+				redis.client().on('ready', ()=>resolve(redis));
 				redis.client().on('error', (err)=>{
 					redis.client().quit();
 					return reject(err);
@@ -28,7 +28,7 @@ const buildScope = (scope='')=>{
 			return new Promise((resolve, reject)=>{
 				redis.client().flushdb((err, success)=>{
 					if(err || !success) return reject(err);
-					return resolve();
+					return resolve(redis);
 				});
 			})
 		},

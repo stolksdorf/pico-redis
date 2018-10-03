@@ -31,7 +31,10 @@ redis.set('test', {fancy : 6})
 	.then(()=>redis.get('test'))
 	.then((val)=>{
 		console.log(val);
-	})
+	});
+
+const userScope = redis.scope('user');
+await userScope.set('current', userId);
 
 ```
 
