@@ -1,17 +1,17 @@
 {
   "name": "pico-redis",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "An incredibly tiny redis wrapper",
   "main": "pico-redis.js",
   "dependencies": {
-    "redis": "^2.7.1"
+    "redis": "^2.8.0"
   },
   "devDependencies": {
-    "ava": "^0.18.2"
+    "pico-check": "^1.1.1"
   },
   "scripts": {
-    "test": "ava --verbose || exit 0",
-    "test:dev": "ava --watch"
+    "test": "pico-check -v",
+    "test:dev": "pico-check -v -w"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,9 @@
   "keywords": [
     "redis",
     "promise",
+    "async",
+    "scoped",
+    "scope",
     "wrapper"
   ],
   "author": "stolksdorf",

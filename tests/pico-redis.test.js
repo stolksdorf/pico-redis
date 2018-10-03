@@ -1,34 +1,31 @@
-const _ = require('lodash');
-const test = require('ava');
+const test = require('pico-check');
 const storage = require('../pico-redis.js');
 
-storage.connect();
+const wait = (time=200)=>new Promise((resolve, reject)=>setTimeout(resolve, time));
 
-test.before(()=>storage.clear());
-
-
-test('Storing values', (t)=>{
-	return storage.set('cool', 6)
-		.then(()=>storage.get('cool'))
-		.then((val)=>{
-			t.is(val, 6);
-		});
+test('Setup', async (t)=>{
+	await storage.connect();
+	await storage.clear();
+	t.is(await storage.get('cool'), undefined);
 });
 
 
-test('Storing values with expiry', (t)=>{
-	return storage.set('with_expiry', true, 2)
-		.then(()=>{
-			return new Promise((resolve)=>setTimeout(resolve, 1000));
-		})
-		.then(()=>storage.get('with_expiry'))
-		.then((val)=>{
-			t.is(val, true);
-		});
+test('Storing values', async (t)=>{
+	await storage.set('cool', 6)
+	t.is(await storage.get('cool'), 6);
 });
 
 
-test('Storing complex values', (t)=>{
+test('Storing values with expiry', async (t)=>{
+	await storage.set('with_expiry', true, 1);
+	await wait(200);
+	t.is(await storage.get('with_expiry'), true);
+	await wait(1800);
+	t.is(await storage.get('with_expiry'), undefined);
+}, {timeout : 3000});
+
+
+test('Storing complex values', async (t)=>{
 	const init_val = {
 		cool : true,
 		foo : [5, "okay this is a test", false],
@@ -36,33 +33,44 @@ test('Storing complex values', (t)=>{
 			doot : "test"
 		}
 	};
-	return storage.set('complex', init_val)
-		.then(()=>storage.get('complex'))
-		.then((val)=>{
-			t.is(_.isEqual(val, init_val), true);
-		});
+	await storage.set('complex', init_val)
+	t.is(await storage.get('complex'), init_val);
 });
 
 
-test('Accessing scoped values', (t)=>{
-	const scoped = storage('test')
-	storage.set('cool', 6)
-		.then(()=>scoped.get('cool'))
-		.then((val)=>{
-			return t.is(val, undefined)
-		})
+test('Accessing scoped values', async (t)=>{
+	const scoped = storage.scope('base');
+	await scoped.set('scoped', 100)
+	t.is(await scoped.get('scoped'), 100)
+	t.is(await storage.get('scoped'), undefined);
+	t.is(await storage.get('base|scoped'), 100);
 });
 
 
-test('Storing scoped values', (t)=>{
-	const scoped = storage('test')
-	scoped.set('cool', 6)
-		.then(()=>scoped.get('cool'))
-		.then((val)=>{
-			return t.is(val, 6)
-		})
+test('can delete key', async (t)=>{
+	await storage.set('delete', true);
+	t.is(await storage.get('delete'), true)
+	await storage.del('delete');
+	t.is(await storage.get('delete'), undefined)
 });
 
 
+// test.skip('keys', async (t)=>{
 
-test.after(()=>storage.close());
+// });
+
+
+test('can create separate clients', async (t)=>{
+	const scoped = storage.scope('separate');
+	t.is(storage.client(), scoped.client());
+	await scoped.connect();
+	t.not(storage.client(), scoped.client());
+	await scoped.close();
+});
+
+test('clean up', async (t)=>{
+	await storage.clear();
+	await storage.close();
+});
+
+module.exports = test;
