@@ -41,10 +41,10 @@ const buildScope = (scope='')=>{
 				});
 			});
 		},
-		set : (key, val, expiryInSeconds)=>{
+		set : (key, val, expiryInMS)=>{
 			return new Promise((resolve, reject)=>{
-				if(expiryInSeconds){
-					redis.client().setex(`${scope}${key}`, expiryInSeconds, JSON.stringify(val), (err)=>err?reject(err):resolve());
+				if(expiryInMS){
+					redis.client().psetex(`${scope}${key}`, expiryInMS, JSON.stringify(val), (err)=>err?reject(err):resolve());
 				}else{
 					redis.client().set(`${scope}${key}`, JSON.stringify(val), (err)=>err?reject(err):resolve());
 				}

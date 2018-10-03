@@ -17,12 +17,12 @@ test('Storing values', async (t)=>{
 
 
 test('Storing values with expiry', async (t)=>{
-	await storage.set('with_expiry', true, 1);
-	await wait(200);
+	await storage.set('with_expiry', true, 100);
+	await wait(50);
 	t.is(await storage.get('with_expiry'), true);
-	await wait(1800);
+	await wait(200);
 	t.is(await storage.get('with_expiry'), undefined);
-}, {timeout : 3000});
+}, {timeout : 800});
 
 
 test('Storing complex values', async (t)=>{

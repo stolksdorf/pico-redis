@@ -39,7 +39,7 @@ await userScope.set('current', userId);
 ```
 
 ### `redis.set(key, val, [expiry])`
-Stores `key-val` pair in redis. Optional `expiry` in seconds. Converts the `val` into stringified JSON. Returns a promise.
+Stores `key-val` pair in redis. Optional `expiry` in milliseconds. Converts the `val` into stringified JSON. Returns a promise.
 
 ### `redis.get(key)`
 Retrieves the `val` stored at `key`. `val` will be attempted to be JSON parsed. Returns a promise.
