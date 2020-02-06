@@ -1,8 +1,6 @@
 const Redis = require('redis');
 let baseClient;
 
-const MIN_VER = [2,6,12];
-
 const compareSemVer = (verA, verB)=>{
 	for(i in verA){
 		if(verA[i] > verB[i]) return true;
@@ -22,9 +20,6 @@ const buildScope = (scope='')=>{
 
 			return new Promise((resolve, reject)=>{
 				redis.client().on('ready', ()=>{
-					if(!compareSemVer(client.server_info.versions, MIN_VER)){
-						return reject(`Err: Must have at least Redis v${MIN_VER.join('.')} installed`);
-					}
 					resolve(redis)
 				});
 				redis.client().on('error', (err)=>{
